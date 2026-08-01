@@ -84,7 +84,7 @@ export function ThesisEditor({
                 min={0}
                 max={50}
                 value={[weights[criterion.id]]}
-                onValueChange={(v) => setWeight(criterion.id, v[0])}
+                onValueChange={(v) => setWeight(criterion.id, Array.isArray(v) ? v[0] : v)}
               />
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 {criterion.description}

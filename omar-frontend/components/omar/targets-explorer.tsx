@@ -286,7 +286,7 @@ function FilterPanel({
           max={FILTER_BOUNDS.ebitda.max}
           step={100_000}
           value={[filters.ebitdaRange.min, filters.ebitdaRange.max]}
-          onValueChange={(v) => update('ebitdaRange', { min: v[0], max: v[1] })}
+          onValueChange={(v) => { const a = Array.isArray(v) ? v : [v]; update('ebitdaRange', { min: a[0], max: a[1] }) }}
         />
         <div className="flex justify-between font-mono text-[10px] text-muted-foreground">
           <span>{formatCompactUsd(filters.ebitdaRange.min)}</span>
@@ -300,7 +300,7 @@ function FilterPanel({
           min={FILTER_BOUNDS.years.min}
           max={FILTER_BOUNDS.years.max}
           value={[filters.minYearsInBusiness]}
-          onValueChange={(v) => update('minYearsInBusiness', v[0])}
+          onValueChange={(v) => update('minYearsInBusiness', Array.isArray(v) ? v[0] : v)}
         />
         <span className="font-mono text-[10px] text-muted-foreground">
           {filters.minYearsInBusiness}+ years
@@ -313,7 +313,7 @@ function FilterPanel({
           min={0}
           max={100}
           value={[filters.minConfidence]}
-          onValueChange={(v) => update('minConfidence', v[0])}
+          onValueChange={(v) => update('minConfidence', Array.isArray(v) ? v[0] : v)}
         />
         <span className="font-mono text-[10px] text-muted-foreground">
           {filters.minConfidence}+ / 100
