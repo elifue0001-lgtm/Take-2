@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { BookmarkIcon, LockIcon, PlusIcon, XIcon } from 'lucide-react'
+import { Bookmark as BookmarkIcon, Lock as LockIcon, Plus as PlusIcon, Bone as XIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'

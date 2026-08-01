@@ -1,14 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  BookmarkIcon,
-  BuildingIcon,
-  ExternalLinkIcon,
-  MapPinIcon,
-  MoreHorizontalIcon,
-  UsersIcon,
-} from 'lucide-react'
+import { Bookmark as BookmarkIcon, Building as BuildingIcon, ExternalLink as ExternalLinkIcon, MapPin as MapPinIcon, MoveHorizontal as MoreHorizontalIcon, Users as UsersIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {

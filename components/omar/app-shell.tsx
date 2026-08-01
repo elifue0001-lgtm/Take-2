@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { RadarIcon } from 'lucide-react'
+import { Radar as RadarIcon } from 'lucide-react'
 
 import {
   Sidebar,

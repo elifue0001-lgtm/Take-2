@@ -1,4 +1,4 @@
-import { LockIcon, MailIcon } from 'lucide-react'
+import { Lock as LockIcon, Mail as MailIcon } from 'lucide-react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'

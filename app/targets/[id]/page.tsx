@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { BuildingIcon, ExternalLinkIcon, MapPinIcon } from 'lucide-react'
+import { Building as BuildingIcon, ExternalLink as ExternalLinkIcon, MapPin as MapPinIcon } from 'lucide-react'
 
 import { PageBody, PageHeader } from '@/components/omar/page-header'
 import {

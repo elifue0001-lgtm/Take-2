@@ -1,4 +1,4 @@
-import { AlertTriangleIcon } from 'lucide-react'
+import { TriangleAlert as AlertTriangleIcon } from 'lucide-react'
 
 import { PageBody, PageHeader } from '@/components/omar/page-header'
 import { SectionLabel } from '@/components/omar/score-primitives'

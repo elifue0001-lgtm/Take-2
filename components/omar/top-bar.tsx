@@ -3,13 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
-import {
-  BellIcon,
-  MoonIcon,
-  SearchIcon,
-  SunIcon,
-  UserIcon,
-} from 'lucide-react'
+import { Bell as BellIcon, Moon as MoonIcon, Search as SearchIcon, Sun as SunIcon, User as UserIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {

@@ -2,12 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-  AlertTriangleIcon,
-  MailIcon,
-  TargetIcon,
-  XIcon,
-} from 'lucide-react'
+import { TriangleAlert as AlertTriangleIcon, Mail as MailIcon, Target as TargetIcon, Bone as XIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {

@@ -7,7 +7,7 @@
  *  - Any inferred value renders with the estimated affordance + tooltip.
  */
 
-import { InfoIcon } from 'lucide-react'
+import { Info as InfoIcon } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import {
