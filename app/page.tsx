@@ -1,5 +1,13 @@
 import Link from 'next/link'
-import { ArrowRight as ArrowRightIcon, Database as DatabaseIcon, Flag as FlagIcon, PencilLine as PencilLineIcon, Radar as RadarIcon, Tag as TagIcon, TrendingUp as TrendingUpIcon } from 'lucide-react'
+import {
+  ArrowRightIcon,
+  DatabaseIcon,
+  FlagIcon,
+  PencilLineIcon,
+  RadarIcon,
+  TagIcon,
+  TrendingUpIcon,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { RefreshCw as RefreshCwIcon } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { triggerSourceRun } from '@/lib/omar/data'

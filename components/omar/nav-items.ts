@@ -1,4 +1,12 @@
-import { Bookmark as BookmarkIcon, Crosshair as CrosshairIcon, Database as DatabaseIcon, Kanban as KanbanIcon, LayoutDashboard as LayoutDashboardIcon, Send as SendIcon, SlidersHorizontal as SlidersHorizontalIcon } from 'lucide-react'
+import {
+  BookmarkIcon,
+  CrosshairIcon,
+  DatabaseIcon,
+  KanbanIcon,
+  LayoutDashboardIcon,
+  SendIcon,
+  SlidersHorizontalIcon,
+} from 'lucide-react'
 
 export const NAV_GROUPS: {
   label: string

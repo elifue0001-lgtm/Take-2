@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Bookmark as BookmarkIcon, List as ListIcon, Save as SaveIcon } from 'lucide-react'
+import { BookmarkIcon, ListIcon, SaveIcon } from 'lucide-react'
 
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
