@@ -494,5 +494,25 @@ export async function revealContact(
   targetId: string,
   contactId: string,
 ): Promise<{ email: string; phone: string }> {
-  return { email: 'unavailable@example.com', phone: '' }
+  const target = SEED_TARGETS.find((t) => t.id === targetId)
+  const contact = target?.contacts.find((c) => c.id === contactId)
+
+  let domain = 'example.com'
+  const website = target?.website.value
+  if (website) {
+    try {
+      domain = new URL(website).hostname.replace(/^www\./, '')
+    } catch {
+      domain = website
+    }
+  }
+
+  const parts = (contact?.name ?? '').trim().split(/\s+/)
+  const first = parts[0]?.[0]?.toLowerCase() ?? ''
+  const last = parts.slice(1).join('').toLowerCase() || parts[0]?.toLowerCase() || 'contact'
+  const email = first && last ? `${first}.${last}@${domain}` : `contact@${domain}`
+
+  const phone = '(555) 000-0000'
+
+  return { email, phone }
 }
