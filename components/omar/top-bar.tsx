@@ -107,9 +107,11 @@ export function TopBar({ alerts }: { alerts: AlertItem[] }) {
             }
           />
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              OMAR — private instance
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                OMAR — private instance
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => router.push('/thesis')}>
@@ -123,10 +125,12 @@ export function TopBar({ alerts }: { alerts: AlertItem[] }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-[11px] font-normal leading-relaxed text-muted-foreground">
-              Authentication is not wired up yet. Add it before this instance
-              holds real deal notes.
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-[11px] font-normal leading-relaxed text-muted-foreground">
+                Authentication is not wired up yet. Add it before this instance
+                holds real deal notes.
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
