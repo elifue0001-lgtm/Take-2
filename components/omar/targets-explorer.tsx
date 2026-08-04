@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FilterIcon, RadarIcon, XIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -70,6 +70,17 @@ export function TargetsExplorer({
     query: initialQuery,
     buckets: initialBucket ? [initialBucket] : [],
   })
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, query: initialQuery }))
+  }, [initialQuery])
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      buckets: initialBucket ? [initialBucket] : [],
+    }))
+  }, [initialBucket])
 
   const results = useMemo(
     () => sortTargets(applyFilters(targets, filters), sort),
