@@ -1,15 +1,16 @@
 import { PageHeader } from '@/components/omar/page-header'
 import { TargetsExplorer } from '@/components/omar/targets-explorer'
-import { getTargets } from '@/lib/omar/data'
-import type { FitBucket } from '@/lib/omar/types'
+import { getSavedSearches, getTargets } from '@/lib/omar/data'
+import type { FitBucket, TargetFilters } from '@/lib/omar/types'
 
 export default async function TargetsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; bucket?: string }>
+  searchParams: Promise<{ q?: string; bucket?: string; savedSearch?: string }>
 }) {
   const params = await searchParams
-  const targets = await getTargets()
+  const [targets, savedSearches] = await Promise.all([getTargets(), getSavedSearches()])
+  const savedSearch = savedSearches.find((search) => search.id === params.savedSearch)
 
   return (
     <>
@@ -21,6 +22,7 @@ export default async function TargetsPage({
         initialTargets={targets}
         initialQuery={params.q ?? ''}
         initialBucket={params.bucket as FitBucket | undefined}
+        initialFilters={savedSearch?.filters as Partial<TargetFilters> | undefined}
       />
     </>
   )
