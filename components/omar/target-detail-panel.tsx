@@ -10,44 +10,53 @@ import { StatusSelect } from '@/components/omar/status-select'
 import {
   addNote,
   revealContact,
-  setTargetStatus,
   setTargetTags,
-  toggleSaved,
   type ScoredTarget,
 } from '@/lib/omar/data'
 import { relativeTime } from '@/lib/omar/scoring'
 import type { PipelineStatus } from '@/lib/omar/types'
+import { useTargetActions } from '@/lib/omar/use-target-actions'
 import { cn } from '@/lib/utils'
 
 export function TargetDetailPanel({ scored }: { scored: ScoredTarget }) {
-  const [target, setTarget] = useState(scored.target)
+  const [targetRecord, setTargetRecord] = useState(scored)
   const [tagDraft, setTagDraft] = useState('')
   const [noteDraft, setNoteDraft] = useState('')
   const [revealed, setRevealed] = useState<Record<string, { email: string; phone: string }>>({})
+  const setTargetList: React.Dispatch<React.SetStateAction<ScoredTarget[]>> = (next) => {
+    const resolved = typeof next === 'function' ? next([targetRecord]) : next
+    setTargetRecord(resolved[0] ?? targetRecord)
+  }
+  const { toggleSave, changeStatus } = useTargetActions([targetRecord], setTargetList)
+  const target = targetRecord.target
 
   async function onToggleSave() {
     const next = !target.saved
-    setTarget((prev) => ({ ...prev, saved: next }))
-    await toggleSaved(target.id, next)
+    await toggleSave(target.id, next)
   }
 
   async function onStatusChange(status: string) {
-    setTarget((prev) => ({ ...prev, status: status as PipelineStatus }))
-    await setTargetStatus(target.id, status as PipelineStatus)
+    await changeStatus(target.id, status as PipelineStatus)
   }
 
   async function onAddTag() {
     const value = tagDraft.trim()
     if (!value || target.tags.includes(value)) return
     const nextTags = [...target.tags, value]
-    setTarget((prev) => ({ ...prev, tags: nextTags }))
+    setTargetRecord((prev) => ({
+      ...prev,
+      target: { ...prev.target, tags: nextTags },
+    }))
     setTagDraft('')
     await setTargetTags(target.id, nextTags)
   }
 
   async function onRemoveTag(tag: string) {
     const nextTags = target.tags.filter((t) => t !== tag)
-    setTarget((prev) => ({ ...prev, tags: nextTags }))
+    setTargetRecord((prev) => ({
+      ...prev,
+      target: { ...prev.target, tags: nextTags },
+    }))
     await setTargetTags(target.id, nextTags)
   }
 
@@ -55,7 +64,10 @@ export function TargetDetailPanel({ scored }: { scored: ScoredTarget }) {
     const body = noteDraft.trim()
     if (!body) return
     const note = await addNote(target.id, body)
-    setTarget((prev) => ({ ...prev, notes: [note, ...prev.notes] }))
+    setTargetRecord((prev) => ({
+      ...prev,
+      target: { ...prev.target, notes: [note, ...prev.target.notes] },
+    }))
     setNoteDraft('')
   }
 

@@ -6,21 +6,20 @@ import Link from 'next/link'
 import { FitScore } from '@/components/omar/score-primitives'
 import { StatusSelect } from '@/components/omar/status-select'
 import { PIPELINE_STATUSES } from '@/lib/omar/config'
-import { setTargetStatus, type ScoredTarget } from '@/lib/omar/data'
+import type { ScoredTarget } from '@/lib/omar/data'
 import { relativeTime } from '@/lib/omar/scoring'
 import type { PipelineStatus } from '@/lib/omar/types'
+import { useTargetActions } from '@/lib/omar/use-target-actions'
 
 export function PipelineBoard({ initialTargets }: { initialTargets: ScoredTarget[] }) {
   const [targets, setTargets] = useState(initialTargets)
+  const { changeStatus } = useTargetActions(targets, setTargets)
 
   const inPipeline = targets.filter((s) => s.target.status !== 'new')
   const columns = PIPELINE_STATUSES.filter((s) => s.id !== 'new')
 
   async function move(id: string, status: PipelineStatus) {
-    setTargets((prev) =>
-      prev.map((s) => (s.target.id === id ? { ...s, target: { ...s.target, status } } : s)),
-    )
-    await setTargetStatus(id, status)
+    await changeStatus(id, status)
   }
 
   return (

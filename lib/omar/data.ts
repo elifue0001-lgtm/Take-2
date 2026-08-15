@@ -34,6 +34,8 @@
  * Search this file for `TODO(backend)` to find each individual swap point.
  */
 
+import { cache } from 'react'
+
 import {
   BUCKETS,
   DEFAULT_WEIGHTS,
@@ -258,11 +260,16 @@ export function sortTargets(
 /* Reads                                                               */
 /* ------------------------------------------------------------------ */
 
+const buildSeedTargetList = cache(
+  (weights: ScoreWeights = DEFAULT_WEIGHTS): ScoredTarget[] =>
+    SEED_TARGETS.map((target) => toScoredTarget(target, weights)),
+)
+
 /** TODO(backend): `SELECT * FROM targets` + join provenance, notes, activity. */
 export async function getTargets(
   weights: ScoreWeights = DEFAULT_WEIGHTS,
 ): Promise<ScoredTarget[]> {
-  return SEED_TARGETS.map((target) => toScoredTarget(target, weights))
+  return buildSeedTargetList(weights)
 }
 
 /** TODO(backend): `SELECT … FROM targets WHERE id = $1`. */
@@ -381,9 +388,11 @@ export async function getAlerts(): Promise<AlertItem[]> {
   })
 }
 
+let savedSearches: SavedSearch[] = [...SEED_SAVED_SEARCHES]
+
 /** TODO(backend): `SELECT * FROM saved_searches WHERE user_id = $1`. */
 export async function getSavedSearches(): Promise<SavedSearch[]> {
-  return SEED_SAVED_SEARCHES
+  return savedSearches
 }
 
 /** TODO(backend): `SELECT * FROM watchlists` + join membership. */
@@ -503,16 +512,31 @@ export async function saveSearch(
   name: string,
   filters: Partial<TargetFilters>,
   resultCount: number,
+  alertsEnabled = false,
 ): Promise<SavedSearch> {
-  return {
+  const saved: SavedSearch = {
     id: `ss-${Math.random().toString(36).slice(2, 8)}`,
     name,
     filters,
     resultCount,
     createdAt: new Date().toISOString(),
     lastRunAt: new Date().toISOString(),
-    alertsEnabled: false,
+    alertsEnabled,
   }
+
+  savedSearches = [saved, ...savedSearches]
+  return saved
+}
+
+/** TODO(backend): Server Action → set alert preference on a saved search. */
+export async function setSavedSearchAlerts(
+  id: string,
+  enabled: boolean,
+): Promise<{ id: string; enabled: boolean }> {
+  savedSearches = savedSearches.map((search) =>
+    search.id === id ? { ...search, alertsEnabled: enabled, lastRunAt: new Date().toISOString() } : search,
+  )
+  return { id, enabled }
 }
 
 /** TODO(backend): Server Action → mark alerts read for the current user. */

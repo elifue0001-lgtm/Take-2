@@ -4,9 +4,9 @@ import { BookmarkIcon, ListIcon, SaveIcon } from 'lucide-react'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageBody, PageHeader } from '@/components/omar/page-header'
-import { TargetCard } from '@/components/omar/target-card'
+import { SavedSearchRow } from '@/components/omar/saved-search-row'
+import { SavedTargetsGrid } from '@/components/omar/saved-targets-grid'
 import { getSavedSearches, getSavedTargets, getWatchlists } from '@/lib/omar/data'
-import { relativeTime } from '@/lib/omar/scoring'
 
 export default async function SavedPage() {
   const [saved, searches, watchlists] = await Promise.all([
@@ -50,11 +50,7 @@ export default async function SavedPage() {
                 </EmptyDescription>
               </Empty>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {saved.map((scored) => (
-                  <TargetCard key={scored.target.id} scored={scored} />
-                ))}
-              </div>
+              <SavedTargetsGrid initialTargets={saved} />
             )}
           </TabsContent>
 
@@ -73,20 +69,7 @@ export default async function SavedPage() {
             ) : (
               <div className="flex flex-col rounded-md border border-border">
                 {searches.map((search) => (
-                  <div
-                    key={search.id}
-                    className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2.5 text-xs last:border-b-0"
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-medium">{search.name}</span>
-                      <span className="font-mono text-[10px] text-muted-foreground">
-                        {search.resultCount} results · last run {relativeTime(search.lastRunAt)}
-                      </span>
-                    </div>
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                      {search.alertsEnabled ? 'Alerts on' : 'Alerts off'}
-                    </span>
-                  </div>
+                  <SavedSearchRow key={search.id} search={search} />
                 ))}
               </div>
             )}

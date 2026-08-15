@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/sheet'
 import { Slider } from '@/components/ui/slider'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Switch } from '@/components/ui/switch'
 import { SectionLabel } from '@/components/omar/score-primitives'
 import { TargetCard } from '@/components/omar/target-card'
 import { BUCKETS, COUNTIES, INDUSTRIES } from '@/lib/omar/config'
@@ -30,11 +31,11 @@ import {
   DEFAULT_FILTERS,
   FILTER_BOUNDS,
   needsEnrichment,
+  saveSearch,
   sortTargets,
-  toggleSaved,
-  setTargetStatus,
   type ScoredTarget,
 } from '@/lib/omar/data'
+import { useTargetActions } from '@/lib/omar/use-target-actions'
 import { formatCompactUsd } from '@/lib/omar/scoring'
 import type {
   CountyId,
@@ -59,17 +60,26 @@ export function TargetsExplorer({
   initialTargets,
   initialQuery = '',
   initialBucket,
+  initialFilters,
 }: {
   initialTargets: ScoredTarget[]
   initialQuery?: string
   initialBucket?: FitBucket
+  initialFilters?: Partial<TargetFilters>
 }) {
   const [targets, setTargets] = useState(initialTargets)
+  const { toggleSave, changeStatus } = useTargetActions(targets, setTargets)
   const [sort, setSort] = useState<TargetSortKey>('fit-desc')
+  const [alertsOnNewMatches, setAlertsOnNewMatches] = useState(false)
   const [filters, setFilters] = useState<TargetFilters>({
     ...DEFAULT_FILTERS,
-    query: initialQuery,
-    buckets: initialBucket ? [initialBucket] : [],
+    ...initialFilters,
+    query: initialQuery || initialFilters?.query || '',
+    buckets: initialBucket
+      ? [initialBucket]
+      : initialFilters?.buckets && Array.isArray(initialFilters.buckets)
+        ? (initialFilters.buckets as FitBucket[])
+        : [],
   })
 
   useEffect(() => {
@@ -79,9 +89,15 @@ export function TargetsExplorer({
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
-      buckets: initialBucket ? [initialBucket] : [],
+      ...initialFilters,
+      buckets: initialBucket
+        ? [initialBucket]
+        : initialFilters?.buckets && Array.isArray(initialFilters.buckets)
+          ? (initialFilters.buckets as FitBucket[])
+          : [],
+      query: initialQuery || initialFilters?.query || '',
     }))
-  }, [initialBucket])
+  }, [initialBucket, initialFilters, initialQuery])
 
   const results = useMemo(
     () => sortTargets(applyFilters(targets, filters), sort),
@@ -111,21 +127,19 @@ export function TargetsExplorer({
   }
 
   async function handleToggleSave(id: string, saved: boolean) {
-    setTargets((prev) =>
-      prev.map((s) => (s.target.id === id ? { ...s, target: { ...s.target, saved } } : s)),
-    )
-    await toggleSaved(id, saved)
+    await toggleSave(id, saved)
   }
 
   async function handleStatusChange(id: string, status: string) {
-    setTargets((prev) =>
-      prev.map((s) =>
-        s.target.id === id
-          ? { ...s, target: { ...s.target, status: status as PipelineStatus } }
-          : s,
-      ),
-    )
-    await setTargetStatus(id, status as PipelineStatus)
+    await changeStatus(id, status as PipelineStatus)
+  }
+
+  async function handleSaveSearch() {
+    const name = window.prompt('Name this saved search', 'New search')
+    if (!name?.trim()) return
+
+    await saveSearch(name.trim(), filters, results.length, alertsOnNewMatches)
+    setAlertsOnNewMatches(false)
   }
 
   const filterPanel = (
@@ -147,6 +161,18 @@ export function TargetsExplorer({
             of {targets.length} targets
           </p>
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-md border border-border bg-card px-2 py-1.5">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                Alerts
+              </span>
+              <Switch
+                checked={alertsOnNewMatches}
+                onCheckedChange={(checked) => setAlertsOnNewMatches(Boolean(checked))}
+              />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleSaveSearch}>
+              Save search
+            </Button>
             <Sheet>
               <SheetTrigger
                 render={
