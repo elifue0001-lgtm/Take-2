@@ -67,15 +67,15 @@ const OWNERSHIP: Record<
 > = {
   'sole-proprietor': {
     label: 'Single named owner-operator',
-    normalized: 1,
+    normalized: 0.8,
     rationale:
-      'Public filings list a single natural person as owner and agent, with no parent entity on record.',
+      'Public filings list a single natural person as owner and agent, with no parent entity on record. This is strong but not the rarest ownership profile, so it no longer carries the full 1.0 premium.',
   },
   family: {
     label: 'Family-held',
-    normalized: 0.95,
+    normalized: 0.78,
     rationale:
-      'Registered agents and officers share a surname across filings; no institutional parent appears in the chain.',
+      'Registered agents and officers share a surname across filings; no institutional parent appears in the chain. Family control is attractive but still short of the rarest owner-only profile.',
   },
   partnership: {
     label: 'Two-partner ownership',
@@ -154,12 +154,12 @@ const DEMAND: Record<
 }
 
 const INDUSTRY_FIT_BY_PRIORITY: Record<number, number> = {
-  1: 1,
-  2: 0.92,
-  3: 0.84,
-  4: 0.76,
-  5: 0.68,
-  6: 0.5,
+  1: 0.85,
+  2: 0.75,
+  3: 0.65,
+  4: 0.56,
+  5: 0.46,
+  6: 0.32,
 }
 
 /* ------------------------------------------------------------------ */
@@ -1851,7 +1851,7 @@ export const SEED_SAVED_SEARCHES: SavedSearch[] = [
     filters: {
       industries: ['fire-protection', 'medical-water', 'biohazard'],
       minYearsInBusiness: 30,
-      buckets: ['ultra', 'high'],
+      buckets: ['high', 'medium'],
       marketStatus: 'off-market',
       excludeFranchises: true,
     },
@@ -1865,7 +1865,7 @@ export const SEED_SAVED_SEARCHES: SavedSearch[] = [
     name: 'Anchor platforms — $2M to $4M EBITDA',
     filters: {
       ebitdaRange: { min: 2_000_000, max: 4_000_000 },
-      buckets: ['ultra', 'high', 'medium'],
+      buckets: ['high', 'medium', 'low'],
       excludeFranchises: true,
     },
     resultCount: 3,
@@ -1927,8 +1927,8 @@ export const SEED_WATCHLISTS: Watchlist[] = [
 export const SEED_ALERTS: AlertItem[] = [
   {
     id: 'al-1',
-    kind: 'ultra-discovery',
-    title: 'Ultra High Quality target discovered',
+    kind: 'top-tier-discovery',
+    title: 'Top-tier target discovered',
     body: 'Foothill Backflow & Cross-Connection — 46 years under one owner, mandated testing revenue, no institutional ownership signals.',
     createdAt: hoursAgo(6),
     read: false,
@@ -1936,8 +1936,8 @@ export const SEED_ALERTS: AlertItem[] = [
   },
   {
     id: 'al-2',
-    kind: 'ultra-discovery',
-    title: 'Ultra High Quality target discovered',
+    kind: 'top-tier-discovery',
+    title: 'Top-tier target discovered',
     body: 'Orange County Document Destruction — family-held since 1993, NAID AAA certified, no website refresh on record.',
     createdAt: hoursAgo(20),
     read: false,

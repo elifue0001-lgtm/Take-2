@@ -53,6 +53,7 @@ import {
 } from './seed'
 import {
   computeConfidence,
+  passesHardFilters,
   scoreTarget,
   yearsInBusiness,
 } from './scoring'
@@ -83,6 +84,7 @@ export interface ScoredTarget {
   score: ReturnType<typeof scoreTarget>
   confidence: ReturnType<typeof computeConfidence>
   years: number | null
+  passesHardFilters: boolean
 }
 
 export function toScoredTarget(
@@ -94,6 +96,7 @@ export function toScoredTarget(
     score: scoreTarget(target, weights),
     confidence: computeConfidence(target),
     years: yearsInBusiness(target),
+    passesHardFilters: passesHardFilters(target),
   }
 }
 
@@ -115,6 +118,7 @@ export const DEFAULT_FILTERS: TargetFilters = {
   marketStatus: 'both',
   excludeFranchises: true,
   weakDigitalOnly: false,
+  showDisqualified: false,
   minRating: 0,
   minReviewCount: 0,
   tags: [],
@@ -135,7 +139,9 @@ export function applyFilters(
 ): ScoredTarget[] {
   const query = filters.query.trim().toLowerCase()
 
-  return scored.filter(({ target, score, confidence, years }) => {
+  return scored.filter(({ target, score, confidence, years, passesHardFilters: passHardFilters }) => {
+    if (!filters.showDisqualified && !passHardFilters) return false
+
     if (query) {
       const haystack = [
         target.name,
@@ -301,20 +307,26 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const activeStatuses = PIPELINE_STATUSES.filter((s) => s.active).map((s) => s.id)
   const weekAgo = NOW.getTime() - 7 * 86_400_000
 
+  const eligible = scored.filter((s) => s.passesHardFilters)
+
   return {
     totalTargets: scored.length,
     newThisWeek: scored.filter(
       (s) => new Date(s.target.discoveredAt).getTime() >= weekAgo,
     ).length,
-    ultraCount: scored.filter((s) => s.score.bucket === 'ultra').length,
+    highCount: eligible.filter((s) => s.score.bucket === 'high').length,
     activePipeline: scored.filter((s) => activeStatuses.includes(s.target.status))
       .length,
-    averageFit: Math.round(
-      scored.reduce((sum, s) => sum + s.score.total, 0) / scored.length,
-    ),
-    dataCoverage: Math.round(
-      scored.reduce((sum, s) => sum + s.confidence.coverage, 0) / scored.length,
-    ),
+    averageFit:
+      eligible.length === 0
+        ? 0
+        : Math.round(eligible.reduce((sum, s) => sum + s.score.total, 0) / eligible.length),
+    dataCoverage:
+      eligible.length === 0
+        ? 0
+        : Math.round(
+            eligible.reduce((sum, s) => sum + s.confidence.coverage, 0) / eligible.length,
+          ),
   }
 }
 
@@ -323,7 +335,7 @@ export async function getBucketCounts(): Promise<Record<string, number>> {
   return Object.fromEntries(
     BUCKETS.map((bucket) => [
       bucket.id,
-      scored.filter((s) => s.score.bucket === bucket.id).length,
+      scored.filter((s) => s.passesHardFilters && s.score.bucket === bucket.id).length,
     ]),
   )
 }
@@ -351,14 +363,22 @@ export async function getRecentActivity(limit = 12): Promise<ActivityEvent[]> {
 
 export async function getSpotlightTargets(limit = 4): Promise<ScoredTarget[]> {
   const scored = await getTargets()
-  return sortTargets(scored, 'fit-desc')
-    .filter((s) => s.score.bucket === 'ultra' || s.score.bucket === 'high')
+  return sortTargets(scored.filter((s) => s.passesHardFilters), 'fit-desc')
+    .filter((s) => s.score.bucket === 'high')
     .slice(0, limit)
 }
 
 /** TODO(backend): `SELECT * FROM alerts WHERE user_id = $1`. */
 export async function getAlerts(): Promise<AlertItem[]> {
-  return SEED_ALERTS
+  const scored = await getTargets()
+  const topTierTargetIds = new Set(
+    scored.filter((item) => item.score.total >= 85).map((item) => item.target.id),
+  )
+
+  return SEED_ALERTS.filter((alert) => {
+    if (alert.kind !== 'top-tier-discovery') return true
+    return alert.targetId ? topTierTargetIds.has(alert.targetId) : false
+  })
 }
 
 /** TODO(backend): `SELECT * FROM saved_searches WHERE user_id = $1`. */
@@ -395,6 +415,28 @@ export async function getSavedTargets(): Promise<ScoredTarget[]> {
     scored.filter((s) => s.target.saved),
     'fit-desc',
   )
+}
+
+export function needsEnrichment(target: Target): boolean {
+  const confidence = computeConfidence(target)
+  return (
+    confidence.band === 'low' ||
+    target.estEbitda.value === null ||
+    target.estRevenue.value === null ||
+    target.cashflowPositive.value === null
+  )
+}
+
+/** TODO(backend): persist this per user, not just in memory. */
+let digestPreference = true
+
+export async function getDigestPreference(): Promise<boolean> {
+  return digestPreference
+}
+
+export async function setDigestPreference(enabled: boolean): Promise<boolean> {
+  digestPreference = enabled
+  return digestPreference
 }
 
 /* ------------------------------------------------------------------ */

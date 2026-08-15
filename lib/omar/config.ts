@@ -154,10 +154,9 @@ export const BUCKETS: {
   min: number
   max: number
 }[] = [
-  { id: 'ultra', label: 'Ultra High Quality', short: 'Ultra', min: 85, max: 100 },
-  { id: 'high', label: 'High Quality', short: 'High', min: 70, max: 84 },
-  { id: 'medium', label: 'Medium Quality', short: 'Medium', min: 55, max: 69 },
-  { id: 'watchlist', label: 'Watchlist', short: 'Watchlist', min: 0, max: 54 },
+  { id: 'high', label: 'High Quality', short: 'High', min: 70, max: 100 },
+  { id: 'medium', label: 'Medium Quality', short: 'Medium', min: 45, max: 69 },
+  { id: 'low', label: 'Low Quality', short: 'Low', min: 0, max: 44 },
 ]
 
 /**
@@ -168,25 +167,19 @@ export const BUCKET_STYLES: Record<
   FitBucket,
   { chip: string; bar: string; text: string; ring: string }
 > = {
-  ultra: {
+  high: {
     chip: 'bg-primary text-primary-foreground border-primary',
     bar: 'bg-primary',
     text: 'text-primary',
     ring: 'ring-primary/40',
   },
-  high: {
+  medium: {
     chip: 'bg-primary/15 text-primary border-primary/35',
     bar: 'bg-primary/70',
     text: 'text-primary',
     ring: 'ring-primary/25',
   },
-  medium: {
-    chip: 'bg-transparent text-foreground border-border',
-    bar: 'bg-muted-foreground/70',
-    text: 'text-foreground',
-    ring: 'ring-border',
-  },
-  watchlist: {
+  low: {
     chip: 'bg-muted text-muted-foreground border-transparent',
     bar: 'bg-muted-foreground/40',
     text: 'text-muted-foreground',

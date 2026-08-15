@@ -22,13 +22,13 @@ import { relativeTime } from '@/lib/omar/scoring'
 import type { AlertItem, AlertKind } from '@/lib/omar/types'
 
 const ALERT_ICONS: Record<AlertKind, typeof TargetIcon> = {
-  'ultra-discovery': TargetIcon,
+  'top-tier-discovery': TargetIcon,
   'outreach-reply': MailIcon,
   'ingestion-error': AlertTriangleIcon,
 }
 
 /**
- * Alerts are deliberately scarce: Ultra discoveries, outreach replies, and
+ * Alerts are deliberately scarce: top-tier discoveries, outreach replies, and
  * ingestion errors only. Anything else belongs in the weekly digest.
  */
 export function AlertsPopover({
@@ -56,7 +56,7 @@ export function AlertsPopover({
 
         {visible.length === 0 ? (
           <p className="px-3 py-6 text-center text-xs text-muted-foreground">
-            No alerts. You are only notified for Ultra discoveries, replies, and
+            No alerts. You are only notified for top-tier discoveries, replies, and
             ingestion errors.
           </p>
         ) : (

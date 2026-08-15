@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import {
+  AlertTriangleIcon,
   BookmarkIcon,
   BuildingIcon,
   ExternalLinkIcon,
@@ -30,9 +31,10 @@ import { COUNTIES, INDUSTRIES } from '@/lib/omar/config'
 import {
   formatCurrencyRange,
   formatRange,
+  hardFilterResults,
   relativeTime,
 } from '@/lib/omar/scoring'
-import type { ScoredTarget } from '@/lib/omar/data'
+import { needsEnrichment, type ScoredTarget } from '@/lib/omar/data'
 import {
   BucketChip,
   ConfidenceMeter,
@@ -58,6 +60,8 @@ export function TargetCard({
   const { target, score, confidence, years } = scored
   const industry = INDUSTRIES.find((i) => i.id === target.industry)
   const county = COUNTIES.find((c) => c.id === target.county)
+  const shouldEnrich = needsEnrichment(target)
+  const firstHardFailure = hardFilterResults(target).find((result) => result.passed === false)
 
   return (
     <Card className={cn('gap-0 overflow-hidden py-0', className)}>
@@ -84,7 +88,24 @@ export function TargetCard({
 
           <div className="flex shrink-0 flex-col items-end gap-1">
             <FitScore score={score.total} bucket={score.bucket} />
-            <BucketChip bucket={score.bucket} variant="short" />
+            <div className="flex flex-wrap items-center justify-end gap-1">
+              <BucketChip bucket={score.bucket} variant="short" />
+              {!scored.passesHardFilters && firstHardFailure ? (
+                <span
+                  className="inline-flex items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-destructive"
+                  title={firstHardFailure.detail}
+                >
+                  <AlertTriangleIcon className="size-2.5" />
+                  Disqualified · {firstHardFailure.label}
+                </span>
+              ) : null}
+              {shouldEnrich ? (
+                <span className="inline-flex items-center gap-1 rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-[0.12em] text-amber-700 dark:text-amber-300">
+                  <AlertTriangleIcon className="size-2.5" />
+                  Needs enrichment
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -246,6 +267,8 @@ function Metric({
 export function TargetCardCompact({ scored }: { scored: ScoredTarget }) {
   const { target, score, confidence } = scored
   const county = COUNTIES.find((c) => c.id === target.county)
+  const shouldEnrich = needsEnrichment(target)
+  const firstHardFailure = hardFilterResults(target).find((result) => result.passed === false)
 
   return (
     <Link
@@ -256,7 +279,26 @@ export function TargetCardCompact({ scored }: { scored: ScoredTarget }) {
         <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-tight">
           {target.name}
         </p>
-        <FitScore score={score.total} bucket={score.bucket} size="sm" />
+        <div className="flex items-center gap-1.5">
+          <FitScore score={score.total} bucket={score.bucket} size="sm" />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center justify-end gap-1">
+        {!scored.passesHardFilters && firstHardFailure ? (
+          <span
+            className="inline-flex items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-1 py-0.5 text-[8px] font-medium uppercase tracking-[0.12em] text-destructive"
+            title={firstHardFailure.detail}
+          >
+            <AlertTriangleIcon className="size-2.5" />
+            Disqualified · {firstHardFailure.label}
+          </span>
+        ) : null}
+        {shouldEnrich ? (
+          <span className="inline-flex items-center gap-1 rounded-sm border border-amber-500/40 bg-amber-500/10 px-1 py-0.5 text-[8px] font-medium uppercase tracking-[0.12em] text-amber-700 dark:text-amber-300">
+            <AlertTriangleIcon className="size-2.5" />
+            Needs enrichment
+          </span>
+        ) : null}
       </div>
       <div className="flex items-center justify-between gap-2">
         <span className="truncate text-[10px] text-muted-foreground">
