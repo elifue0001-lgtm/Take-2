@@ -29,6 +29,7 @@ import {
   applyFilters,
   DEFAULT_FILTERS,
   FILTER_BOUNDS,
+  needsEnrichment,
   sortTargets,
   toggleSaved,
   setTargetStatus,
@@ -85,6 +86,14 @@ export function TargetsExplorer({
   const results = useMemo(
     () => sortTargets(applyFilters(targets, filters), sort),
     [targets, filters, sort],
+  )
+  const verifyQueue = useMemo(
+    () => sortTargets(results.filter((scored) => needsEnrichment(scored.target)), 'fit-desc'),
+    [results],
+  )
+  const regularResults = useMemo(
+    () => results.filter((scored) => !needsEnrichment(scored.target)),
+    [results],
   )
 
   function update<K extends keyof TargetFilters>(key: K, value: TargetFilters[K]) {
@@ -170,6 +179,29 @@ export function TargetsExplorer({
           </div>
         </div>
 
+        {verifyQueue.length > 0 ? (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <SectionLabel className="text-amber-700 dark:text-amber-300">
+                Verify these next
+              </SectionLabel>
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-amber-700 dark:text-amber-300">
+                {verifyQueue.length}
+              </span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {verifyQueue.map((scored) => (
+                <TargetCard
+                  key={scored.target.id}
+                  scored={scored}
+                  onToggleSave={handleToggleSave}
+                  onStatusChange={handleStatusChange}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         {results.length === 0 ? (
           <Empty className="border">
             <EmptyMedia variant="icon">
@@ -184,9 +216,11 @@ export function TargetsExplorer({
               Reset filters
             </Button>
           </Empty>
-        ) : (
+        ) : null}
+
+        {regularResults.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {results.map((scored) => (
+            {regularResults.map((scored) => (
               <TargetCard
                 key={scored.target.id}
                 scored={scored}
@@ -195,7 +229,7 @@ export function TargetsExplorer({
               />
             ))}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
@@ -343,6 +377,11 @@ function FilterPanel({
           checked={filters.weakDigitalOnly}
           onCheckedChange={(v) => update('weakDigitalOnly', Boolean(v))}
         />
+        <CheckRow
+          label="Show disqualified"
+          checked={filters.showDisqualified}
+          onCheckedChange={(v) => update('showDisqualified', Boolean(v))}
+        />
       </div>
     </div>
   )
@@ -370,6 +409,7 @@ function hasActiveFilters(filters: TargetFilters): boolean {
     filters.query.length > 0 ||
     filters.industries.length > 0 ||
     filters.counties.length > 0 ||
-    filters.buckets.length > 0
+    filters.buckets.length > 0 ||
+    filters.showDisqualified
   )
 }

@@ -52,7 +52,7 @@ export function scoreTarget(
 export function bucketForScore(score: number): FitBucket {
   return (
     BUCKETS.find((bucket) => score >= bucket.min && score <= bucket.max)?.id ??
-    'watchlist'
+    'low'
   )
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import {
   BellIcon,
@@ -30,6 +30,7 @@ import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Switch } from '@/components/ui/switch'
 import { AlertsPopover } from '@/components/omar/alerts-popover'
+import { getDigestPreference, setDigestPreference } from '@/lib/omar/data'
 import type { AlertItem } from '@/lib/omar/types'
 
 export function TopBar({ alerts }: { alerts: AlertItem[] }) {
@@ -37,6 +38,16 @@ export function TopBar({ alerts }: { alerts: AlertItem[] }) {
   const { resolvedTheme, setTheme } = useTheme()
   const [query, setQuery] = useState('')
   const [digest, setDigest] = useState(true)
+
+  useEffect(() => {
+    let ignore = false
+    void getDigestPreference().then((enabled) => {
+      if (!ignore) setDigest(enabled)
+    })
+    return () => {
+      ignore = true
+    }
+  }, [])
 
   function submit(event: React.FormEvent) {
     event.preventDefault()
@@ -74,7 +85,11 @@ export function TopBar({ alerts }: { alerts: AlertItem[] }) {
           <Switch
             id="digest-toggle"
             checked={digest}
-            onCheckedChange={setDigest}
+            onCheckedChange={(checked) => {
+              const enabled = Boolean(checked)
+              setDigest(enabled)
+              void setDigestPreference(enabled)
+            }}
             aria-label="Toggle weekly digest"
           />
         </div>

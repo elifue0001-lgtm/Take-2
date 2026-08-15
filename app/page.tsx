@@ -65,7 +65,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           <StatTile label="Total targets" value={stats.totalTargets} />
           <StatTile label="New this week" value={stats.newThisWeek} />
-          <StatTile label="Ultra quality" value={stats.ultraCount} accent />
+          <StatTile label="High quality" value={stats.highCount} accent />
           <StatTile label="Active pipeline" value={stats.activePipeline} />
           <StatTile label="Average fit" value={`${stats.averageFit}`} suffix="/100" />
           <StatTile label="Data coverage" value={`${stats.dataCoverage}%`} />
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
               <EmptyMedia variant="icon">
                 <RadarIcon />
               </EmptyMedia>
-              <EmptyTitle>No Ultra or High targets yet</EmptyTitle>
+              <EmptyTitle>No High targets yet</EmptyTitle>
               <EmptyDescription>
                 Connect a data source or widen the buy box on the Targets screen.
               </EmptyDescription>

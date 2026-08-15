@@ -36,6 +36,7 @@ export default async function TargetDetailPage({
   const industry = INDUSTRIES.find((i) => i.id === target.industry)
   const county = COUNTIES.find((c) => c.id === target.county)
   const hardFilters = hardFilterResults(target)
+  const hasFailedHardFilters = hardFilters.some((filter) => filter.passed === false)
 
   return (
     <>
@@ -87,7 +88,11 @@ export default async function TargetDetailPage({
           </section>
 
           <section className="flex flex-col gap-2">
-            <SectionLabel>Hard filters</SectionLabel>
+            <SectionLabel
+              className={hasFailedHardFilters ? 'text-destructive' : undefined}
+            >
+              {hasFailedHardFilters ? 'Hard filters — failed' : 'Hard filters'}
+            </SectionLabel>
             <div className="flex flex-col rounded-md border border-border">
               {hardFilters.map((filter) => (
                 <div

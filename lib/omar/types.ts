@@ -27,7 +27,7 @@ export type CriterionId =
   | 'operatingHistory'
   | 'stableDemand'
 
-export type FitBucket = 'ultra' | 'high' | 'medium' | 'watchlist'
+export type FitBucket = 'high' | 'medium' | 'low'
 
 export type ConfidenceBand = 'low' | 'medium' | 'high'
 
@@ -224,6 +224,7 @@ export interface TargetFilters {
   marketStatus: MarketStatus | 'both'
   excludeFranchises: boolean
   weakDigitalOnly: boolean
+  showDisqualified: boolean
   minRating: number
   minReviewCount: number
   tags: string[]
@@ -255,7 +256,7 @@ export interface Watchlist {
   targetIds: string[]
 }
 
-export type AlertKind = 'ultra-discovery' | 'outreach-reply' | 'ingestion-error'
+export type AlertKind = 'top-tier-discovery' | 'outreach-reply' | 'ingestion-error'
 
 export interface AlertItem {
   id: string
@@ -306,7 +307,7 @@ export interface OutreachTemplate {
 export interface DashboardStats {
   totalTargets: number
   newThisWeek: number
-  ultraCount: number
+  highCount: number
   activePipeline: number
   averageFit: number
   dataCoverage: number
