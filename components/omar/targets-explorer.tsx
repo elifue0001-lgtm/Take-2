@@ -150,7 +150,7 @@ export function TargetsExplorer({
 
   return (
     <div className="flex min-w-0 h-full flex-1 flex-col gap-4 p-4 md:flex-row md:gap-5 md:p-6">
-      <aside className="hidden w-64 shrink-0 md:block h-full overflow-y-auto">
+      <aside className="hidden w-64 shrink-0 md:block h-full overflow-y-auto overflow-x-hidden">
         <div className="h-full flex flex-col gap-5 pr-1">
           {filterPanel}
         </div>

@@ -38,7 +38,7 @@ export function AppShell({
         <OmarSidebar />
         <SidebarInset className="min-w-0 h-screen overflow-hidden flex flex-col">
           <TopBar alerts={alerts} />
-          <div className="min-w-0 flex-1 overflow-y-auto">{children}</div>
+          <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">{children}</div>
         </SidebarInset>
       </SidebarProvider>
       <Toaster position="bottom-right" />
