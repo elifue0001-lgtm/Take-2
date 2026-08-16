@@ -110,10 +110,12 @@ export default async function DashboardPage() {
               </EmptyDescription>
             </Empty>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {spotlight.map((scored) => (
-                <TargetCardCompact key={scored.target.id} scored={scored} />
-              ))}
+            <div className="@container">
+              <div className="grid gap-3 @lg:grid-cols-2 @xl:grid-cols-3">
+                {spotlight.map((scored) => (
+                  <TargetCardCompact key={scored.target.id} scored={scored} />
+                ))}
+              </div>
             </div>
           )}
         </section>

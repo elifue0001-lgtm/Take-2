@@ -40,6 +40,28 @@ export function ThesisEditor({
     setWeights((prev) => ({ ...prev, [id]: value }))
   }
 
+  function autoBalance() {
+    const entries = Object.entries(weights) as [CriterionId, number][]
+    const currentTotal = entries.reduce((sum, [, value]) => sum + value, 0)
+    if (currentTotal === 0) return
+
+    const scaled = entries.map(([id, value]) => [id, value / currentTotal] as const)
+    const rounded = scaled.map(([id, ratio]) => [id, Math.round(ratio * 100)] as const)
+    const roundedTotal = rounded.reduce((sum, [, value]) => sum + value, 0)
+    const diff = 100 - roundedTotal
+    const largestIndex = rounded.reduce(
+      (best, current, index) => (current[1] > rounded[best][1] ? index : best),
+      0,
+    )
+    const adjusted = rounded.map(([id, value], index) => [id, index === largestIndex ? value + diff : value] as const)
+
+    setWeights((prev) => {
+      const next = { ...prev }
+      for (const [id, value] of adjusted) next[id] = value
+      return next
+    })
+  }
+
   async function onPublish() {
     if (!valid) {
       toast.error('Weights must total exactly 100 before publishing.')
@@ -59,17 +81,26 @@ export function ThesisEditor({
     <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-4 rounded-md border border-border p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <SectionLabel>Scoring weights</SectionLabel>
-            <span
-              className={
-                valid
-                  ? 'font-mono text-xs text-primary'
-                  : 'font-mono text-xs text-destructive'
-              }
-            >
-              {total} / 100 {valid ? '' : '— must equal 100'}
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={autoBalance}
+                className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+              >
+                Auto-balance
+              </button>
+              <span
+                className={
+                  valid
+                    ? 'font-mono text-xs text-primary'
+                    : 'font-mono text-xs text-destructive'
+                }
+              >
+                {total} / 100 {valid ? '' : '— must equal 100'}
+              </span>
+            </div>
           </div>
 
           {CRITERIA.map((criterion) => (

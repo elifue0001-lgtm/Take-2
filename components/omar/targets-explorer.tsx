@@ -61,11 +61,13 @@ export function TargetsExplorer({
   initialQuery = '',
   initialBucket,
   initialFilters,
+  tags = [],
 }: {
   initialTargets: ScoredTarget[]
   initialQuery?: string
   initialBucket?: FitBucket
   initialFilters?: Partial<TargetFilters>
+  tags?: string[]
 }) {
   const [targets, setTargets] = useState(initialTargets)
   const { toggleSave, changeStatus } = useTargetActions(targets, setTargets)
@@ -143,18 +145,18 @@ export function TargetsExplorer({
   }
 
   const filterPanel = (
-    <FilterPanel filters={filters} update={update} toggleInArray={toggleInArray} />
+    <FilterPanel filters={filters} update={update} toggleInArray={toggleInArray} tags={tags} />
   )
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 md:flex-row md:gap-5 md:p-6">
-      <aside className="hidden w-64 shrink-0 md:block">
-        <div className="sticky top-[4.5rem] flex max-h-[calc(100vh-6rem)] flex-col gap-5 overflow-y-auto pr-1">
+    <div className="flex min-w-0 h-full flex-1 flex-col gap-4 p-4 md:flex-row md:gap-5 md:p-6">
+      <aside className="hidden w-64 shrink-0 md:block h-full overflow-y-auto overflow-x-hidden">
+        <div className="h-full flex flex-col gap-5 pr-1">
           {filterPanel}
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground">
             <span className="font-mono font-medium text-foreground">{results.length}</span>{' '}
@@ -215,7 +217,8 @@ export function TargetsExplorer({
                 {verifyQueue.length}
               </span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="@container">
+            <div className="grid gap-3 @lg:grid-cols-2 @xl:grid-cols-3">
               {verifyQueue.map((scored) => (
                 <TargetCard
                   key={scored.target.id}
@@ -245,15 +248,17 @@ export function TargetsExplorer({
         ) : null}
 
         {regularResults.length > 0 ? (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {regularResults.map((scored) => (
-              <TargetCard
-                key={scored.target.id}
-                scored={scored}
-                onToggleSave={handleToggleSave}
-                onStatusChange={handleStatusChange}
-              />
-            ))}
+          <div className="@container">
+            <div className="grid gap-3 @lg:grid-cols-2 @xl:grid-cols-3">
+              {regularResults.map((scored) => (
+                <TargetCard
+                  key={scored.target.id}
+                  scored={scored}
+                  onToggleSave={handleToggleSave}
+                  onStatusChange={handleStatusChange}
+                />
+              ))}
+            </div>
           </div>
         ) : null}
       </div>
@@ -265,10 +270,12 @@ function FilterPanel({
   filters,
   update,
   toggleInArray,
+  tags,
 }: {
   filters: TargetFilters
   update: <K extends keyof TargetFilters>(key: K, value: TargetFilters[K]) => void
   toggleInArray: <T>(key: keyof TargetFilters, value: T) => void
+  tags: string[]
 }) {
   return (
     <div className="flex flex-col gap-5">
@@ -409,6 +416,22 @@ function FilterPanel({
           onCheckedChange={(v) => update('showDisqualified', Boolean(v))}
         />
       </div>
+
+      {tags.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <SectionLabel>Tags</SectionLabel>
+          <div className="flex flex-col gap-1.5">
+            {tags.map((tag) => (
+              <CheckRow
+                key={tag}
+                label={tag}
+                checked={filters.tags.includes(tag)}
+                onCheckedChange={() => toggleInArray<string>('tags', tag)}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

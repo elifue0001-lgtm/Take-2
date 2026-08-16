@@ -1,19 +1,22 @@
-import Link from 'next/link'
-import { BookmarkIcon, ListIcon, SaveIcon } from 'lucide-react'
+import { BookmarkIcon, ChevronDownIcon, ListIcon, SaveIcon } from 'lucide-react'
 
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageBody, PageHeader } from '@/components/omar/page-header'
 import { SavedSearchRow } from '@/components/omar/saved-search-row'
 import { SavedTargetsGrid } from '@/components/omar/saved-targets-grid'
-import { getSavedSearches, getSavedTargets, getWatchlists } from '@/lib/omar/data'
+import { getSavedSearches, getSavedTargets, getTargets, getWatchlists } from '@/lib/omar/data'
 
 export default async function SavedPage() {
-  const [saved, searches, watchlists] = await Promise.all([
+  const [saved, searches, watchlists, targets] = await Promise.all([
     getSavedTargets(),
     getSavedSearches(),
     getWatchlists(),
+    getTargets(),
   ])
+
+  const targetLookup = new Map(targets.map((scored) => [scored.target.id, scored]))
 
   return (
     <>
@@ -89,28 +92,42 @@ export default async function SavedPage() {
               </Empty>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
-                {watchlists.map((watchlist) => (
-                  <div key={watchlist.id} className="rounded-md border border-border p-3">
-                    <p className="text-sm font-semibold">{watchlist.name}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {watchlist.description}
-                    </p>
-                    <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                      {watchlist.targetIds.length} targets
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {watchlist.targetIds.slice(0, 6).map((id) => (
-                        <Link
-                          key={id}
-                          href={`/targets/${id}`}
-                          className="rounded-sm bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground"
-                        >
-                          {id}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                {watchlists.map((watchlist) => {
+                  const members = watchlist.targetIds
+                    .map((id) => targetLookup.get(id))
+                    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+
+                  return (
+                    <Collapsible key={watchlist.id} className="rounded-md border border-border bg-card">
+                      <div className="p-3">
+                        <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-left">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">{watchlist.name}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                              {watchlist.description}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                              {members.length} targets
+                            </span>
+                            <ChevronDownIcon className="size-3.5 text-muted-foreground" />
+                          </div>
+                        </CollapsibleTrigger>
+                      </div>
+
+                      <CollapsibleContent className="border-t border-border p-3">
+                        {members.length === 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            No matching targets found in the current dataset.
+                          </p>
+                        ) : (
+                          <SavedTargetsGrid initialTargets={members} />
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  )
+                })}
               </div>
             )}
           </TabsContent>

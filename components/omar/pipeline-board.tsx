@@ -26,15 +26,33 @@ export function PipelineBoard({ initialTargets }: { initialTargets: ScoredTarget
     <div className="flex min-w-full gap-3 overflow-x-auto p-4 md:p-6">
       {columns.map((column) => {
         const items = inPipeline.filter((s) => s.target.status === column.id)
+        const isDead = column.id === 'dead'
+        const isPassed = column.id === 'passed'
+
         return (
-          <div key={column.id} className="flex w-64 shrink-0 flex-col gap-2">
+          <div
+            key={column.id}
+            className={[
+              'flex w-64 shrink-0 flex-col gap-2',
+              isDead ? 'border-l-2 border-dashed border-destructive/40 pl-3' : '',
+            ].join(' ')}
+          >
             <div className="flex items-center justify-between px-1">
               <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {column.label}
               </span>
               <span className="font-mono text-[10px] text-muted-foreground">{items.length}</span>
             </div>
-            <div className="flex min-h-16 flex-col gap-2 rounded-md border border-dashed border-border p-1.5">
+            <div
+              className={[
+                'flex min-h-16 flex-col gap-2 rounded-md border p-1.5',
+                isDead
+                  ? 'border-destructive/35 bg-destructive/5 border-dashed'
+                  : isPassed
+                    ? 'border-muted-foreground/30 bg-muted/40 border-dashed'
+                    : 'border-border border-dashed bg-card',
+              ].join(' ')}
+            >
               {items.length === 0 ? (
                 <p className="px-2 py-4 text-center text-[11px] text-muted-foreground">
                   Nothing here
@@ -43,7 +61,14 @@ export function PipelineBoard({ initialTargets }: { initialTargets: ScoredTarget
                 items.map((scored) => (
                   <div
                     key={scored.target.id}
-                    className="flex flex-col gap-1.5 rounded-md border border-border bg-card p-2.5"
+                    className={[
+                      'flex flex-col gap-1.5 rounded-md border p-2.5',
+                      isDead
+                        ? 'border-destructive/30 bg-destructive/5'
+                        : isPassed
+                          ? 'border-muted-foreground/20 bg-muted/35'
+                          : 'border-border bg-card',
+                    ].join(' ')}
                   >
                     <Link
                       href={`/targets/${scored.target.id}`}

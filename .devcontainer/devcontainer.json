@@ -1,0 +1,19 @@
+{
+  "name": "Node.js & Next.js Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers"
+      ]
+    }
+  },
+  "postCreateCommand": "corepack enable && npm install",
+  "forwardPorts": [3000],
+  "remoteUser": "node"
+}

@@ -36,9 +36,9 @@ export function AppShell({
     <TooltipProvider delay={200}>
       <SidebarProvider>
         <OmarSidebar />
-        <SidebarInset className="min-w-0">
+        <SidebarInset className="min-w-0 h-screen overflow-hidden flex flex-col">
           <TopBar alerts={alerts} />
-          <div className="min-w-0 flex-1">{children}</div>
+          <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">{children}</div>
         </SidebarInset>
       </SidebarProvider>
       <Toaster position="bottom-right" />

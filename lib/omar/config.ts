@@ -210,9 +210,8 @@ export const PIPELINE_STATUSES: {
 }[] = [
   { id: 'new', label: 'New', active: false, terminal: false },
   { id: 'reviewing', label: 'Reviewing', active: true, terminal: false },
-  { id: 'qualified', label: 'Qualified', active: true, terminal: false },
-  { id: 'contacted', label: 'Contacted', active: true, terminal: false },
-  { id: 'in-conversation', label: 'In Conversation', active: true, terminal: false },
+  { id: 'qualified', label: 'Fits Buy Box', active: true, terminal: false },
+  { id: 'contacted', label: 'In Contact', active: true, terminal: false },
   { id: 'diligence', label: 'Diligence', active: true, terminal: false },
   { id: 'loi', label: 'LOI', active: true, terminal: false },
   { id: 'passed', label: 'Passed', active: false, terminal: true },
