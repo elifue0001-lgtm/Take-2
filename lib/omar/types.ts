@@ -38,7 +38,6 @@ export type PipelineStatus =
   | 'reviewing'
   | 'qualified'
   | 'contacted'
-  | 'in-conversation'
   | 'diligence'
   | 'loi'
   | 'passed'

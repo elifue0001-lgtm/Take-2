@@ -22,15 +22,17 @@ export function SavedTargetsGrid({ initialTargets }: { initialTargets: ScoredTar
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {targets.map((scored) => (
-        <TargetCard
-          key={scored.target.id}
-          scored={scored}
-          onToggleSave={handleToggleSave}
-          onStatusChange={handleStatusChange}
-        />
-      ))}
+    <div className="@container">
+      <div className="grid gap-3 @lg:grid-cols-2 @xl:grid-cols-3">
+        {targets.map((scored) => (
+          <TargetCard
+            key={scored.target.id}
+            scored={scored}
+            onToggleSave={handleToggleSave}
+            onStatusChange={handleStatusChange}
+          />
+        ))}
+      </div>
     </div>
   )
 }
